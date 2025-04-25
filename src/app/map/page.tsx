@@ -2,31 +2,49 @@
 
 import dynamic from "next/dynamic";
 import SliderRadius from "./SliderRadius";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { filterLocationsByRadius } from "@/lib/utils";
+import { locationsGenerator } from "@/lib/database/Locations";
 
 const Map = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
 
 const center: LatLngType = [1.851763, -76.046773];
 
-const locations: LocationType[] = [
-  { lat: 1.855, lng: -76.046775, title: "Marcador 1" },
-  { lat: 1.837, lng: -76.04767, title: "Marcador 2" },
-  { lat: 1.858, lng: -76.04268, title: "Marcador 3" },
-];
+const DEFAULT_RADIUS = 500;
 
 const MapPage = () => {
-  const [radius, setRadius] = useState(500);
+  const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [filterLocations, setFilterLocations] = useState<
     LocationType[] | undefined
   >();
 
+  const LOCATIONS: LocationType[] = useMemo(
+    () => locationsGenerator(center),
+    []
+  );
+
+  const handleSetNewFilteredLocations = useCallback(
+    (radius: number) => {
+      const filteredLocations = filterLocationsByRadius(
+        LOCATIONS,
+        center,
+        radius
+      );
+      setFilterLocations(filteredLocations);
+    },
+    [LOCATIONS]
+  );
+
+  useEffect(() => {
+    if (LOCATIONS.length > 0) {
+      handleSetNewFilteredLocations(DEFAULT_RADIUS / 1000);
+    }
+  }, [LOCATIONS, handleSetNewFilteredLocations]);
+
   const handleSetRadius = (value: number) => {
     setRadius(value * 1000);
 
-    const filteredLocations = filterLocationsByRadius(locations, center, value);
-
-    setFilterLocations(filteredLocations);
+    handleSetNewFilteredLocations(value);
   };
 
   return (
@@ -43,8 +61,8 @@ const MapPage = () => {
           circle={{
             center: center,
             radius: radius,
-            color: "red",
-            fillColor: "#f03",
+            color: "#66b2ff",
+            fillColor: "#99CCFF",
             fillOpacity: 0.3,
           }}
         />

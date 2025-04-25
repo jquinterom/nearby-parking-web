@@ -9,7 +9,7 @@ function deg2rad(deg: number): number {
   return deg * (Math.PI / 180);
 }
 
-export const haversineDistance = (
+const haversineDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
@@ -42,4 +42,36 @@ export const filterLocationsByRadius = (
     );
     return distance <= radiusKm;
   });
+};
+
+// Función para generar un punto aleatorio dentro del radio
+export const generateRandomPoint = (
+  center: LatLngType,
+  minRadius: number,
+  maxRadius: number
+): LatLngType => {
+  const [centerLat, centerLng] = center;
+
+  const centerLatRad = deg2rad(centerLat);
+  const centerLngRad = deg2rad(centerLng);
+
+  const distance = minRadius + Math.random() * (maxRadius - minRadius);
+
+  const angle = Math.random() * 2 * Math.PI;
+
+  const earthRadius = 6371000;
+
+  const angularDistance = distance / earthRadius;
+  const newLatRad = Math.asin(
+    Math.sin(centerLatRad) * Math.cos(angularDistance) +
+      Math.cos(centerLatRad) * Math.sin(angularDistance) * Math.cos(angle)
+  );
+  const newLngRad =
+    centerLngRad +
+    Math.atan2(
+      Math.sin(angle) * Math.sin(angularDistance) * Math.cos(centerLatRad),
+      Math.cos(angularDistance) - Math.sin(centerLatRad) * Math.sin(newLatRad)
+    );
+
+  return [(newLatRad * 180) / Math.PI, (newLngRad * 180) / Math.PI];
 };

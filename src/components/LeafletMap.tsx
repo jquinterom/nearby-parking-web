@@ -5,38 +5,26 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet-color-markers";
-
-const DefaultIcon = L.icon({
-  iconUrl: "/images/marker-icon.png",
-  iconRetinaUrl: "/images/marker-icon-2x.png",
-  shadowUrl: "/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
-
-const redIcon = new L.Icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+import { DefaultIcon, GrayIcon, GreenIcon, RedIcon } from "./IconMap";
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-interface Location {
-  lat: number;
-  lng: number;
-  title?: string;
-}
+const markIcon = (location: LocationType) => {
+  console.log(
+    "location",
+    `${location.title} - ${location.isFree ? "Free" : "Pay"} ${
+      location.isOpen ? "Open" : "Closed"
+    } ${location.isBusy && " • Busy"}`
+  );
+
+  if (location.isBusy || !location.isOpen) {
+    return GrayIcon;
+  }
+  return location.isFree ? GreenIcon : RedIcon;
+};
 
 interface LeafletMapProps {
-  locations?: Location[];
+  locations?: LocationType[];
   center?: LatLngType;
   zoom?: number;
   circle?: {
@@ -79,9 +67,21 @@ const LeafletMap = ({
           <Marker
             key={index}
             position={[location.lat, location.lng]}
-            icon={redIcon}
+            icon={markIcon(location)}
           >
-            {location.title && <Popup>{location.title}</Popup>}
+            {location.title && (
+              <Popup>
+                <span className="font-bold">{location.title}</span>
+                <br />
+                <span>
+                  {location.isFree ? "Free" : "Pay"} {"• "}
+                </span>
+                <span>{location.isOpen ? "Open" : "Closed"}</span>
+                <span>{location.isBusy && " • Busy"}</span>
+                <br />
+                {location.price && <span>Price: {location.price}$</span>}
+              </Popup>
+            )}
           </Marker>
         ))}
 
