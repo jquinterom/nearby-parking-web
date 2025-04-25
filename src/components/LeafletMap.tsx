@@ -37,7 +37,7 @@ interface Location {
 
 interface LeafletMapProps {
   locations?: Location[];
-  center?: [number, number];
+  center?: LatLngType;
   zoom?: number;
   circle?: {
     center: L.LatLngExpression;

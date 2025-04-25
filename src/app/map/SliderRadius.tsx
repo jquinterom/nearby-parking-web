@@ -1,8 +1,17 @@
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
 
-const SliderRadius = () => {
+interface SliderRadiusProps {
+  handleSetRadius: (value: number) => void;
+}
+
+const SliderRadius = ({ handleSetRadius }: SliderRadiusProps) => {
   const [radius, setRadius] = useState(0.5);
+
+  const handleChangeRadius = (value: number) => {
+    setRadius(value);
+    handleSetRadius(value);
+  };
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
@@ -14,7 +23,7 @@ const SliderRadius = () => {
         step={0.1}
         name="Radius"
         onValueChange={(value) => {
-          setRadius(value[0]);
+          handleChangeRadius(value[0]);
         }}
       />
     </div>
