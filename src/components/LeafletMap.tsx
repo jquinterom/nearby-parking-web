@@ -1,11 +1,18 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Circle,
+  useMapEvents,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet-color-markers";
-import { DefaultIcon, GrayIcon, GreenIcon, RedIcon } from "./IconMap";
+import { BlueIcon, DefaultIcon, GrayIcon, GreenIcon, RedIcon } from "./IconMap";
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -35,6 +42,27 @@ interface LeafletMapProps {
     fillOpacity?: number;
   };
 }
+
+const LocationMarker = () => {
+  const [position, setPosition] = useState<L.LatLng | null>(null);
+
+  useMapEvents({
+    dblclick(e) {
+      setPosition(e.latlng);
+      console.log("Coordenadas capturadas:", e.latlng);
+    },
+  });
+
+  return position === null ? null : (
+    <Marker position={position} icon={BlueIcon}>
+      <Popup>
+        Ubicación seleccionada: <br />
+        Lat: {position.lat.toFixed(6)}, <br />
+        Lng: {position.lng.toFixed(6)}
+      </Popup>
+    </Marker>
+  );
+};
 
 const LeafletMap = ({
   locations = [],
@@ -96,6 +124,8 @@ const LeafletMap = ({
             }}
           />
         )}
+
+        <LocationMarker />
       </MapContainer>
     </div>
   );
