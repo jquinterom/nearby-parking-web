@@ -1,29 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Circle,
-  useMapEvents,
-} from "react-leaflet";
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet-color-markers";
-import { BlueIcon, DefaultIcon, GrayIcon, GreenIcon, RedIcon } from "./IconMap";
+import { DefaultIcon, GrayIcon, GreenIcon, RedIcon } from "../IconMap";
+import { LocationMarker } from "./LocationMarker";
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const markIcon = (location: LocationType) => {
-  console.log(
-    "location",
-    `${location.title} - ${location.isFree ? "Free" : "Pay"} ${
-      location.isOpen ? "Open" : "Closed"
-    } ${location.isBusy && " • Busy"}`
-  );
-
   if (location.isBusy || !location.isOpen) {
     return GrayIcon;
   }
@@ -41,34 +28,15 @@ interface LeafletMapProps {
     fillColor?: string;
     fillOpacity?: number;
   };
+  onDoubleClick?: (location: L.LatLng) => void;
 }
-
-const LocationMarker = () => {
-  const [position, setPosition] = useState<L.LatLng | null>(null);
-
-  useMapEvents({
-    dblclick(e) {
-      setPosition(e.latlng);
-      console.log("Coordenadas capturadas:", e.latlng);
-    },
-  });
-
-  return position === null ? null : (
-    <Marker position={position} icon={BlueIcon}>
-      <Popup>
-        Ubicación seleccionada: <br />
-        Lat: {position.lat.toFixed(6)}, <br />
-        Lng: {position.lng.toFixed(6)}
-      </Popup>
-    </Marker>
-  );
-};
 
 const LeafletMap = ({
   locations = [],
   center = [0.0, 0.0],
   zoom = 13,
   circle,
+  onDoubleClick,
 }: LeafletMapProps) => {
   const [isClient, setIsClient] = React.useState(false);
 
@@ -107,7 +75,7 @@ const LeafletMap = ({
                 <span>{location.isOpen ? "Open" : "Closed"}</span>
                 <span>{location.isBusy && " • Busy"}</span>
                 <br />
-                {location.price && <span>Price: {location.price}$</span>}
+                {!location.isFree && <span>Price: {location.price}$</span>}
               </Popup>
             )}
           </Marker>
@@ -125,7 +93,7 @@ const LeafletMap = ({
           />
         )}
 
-        <LocationMarker />
+        <LocationMarker onDoubleClick={onDoubleClick} />
       </MapContainer>
     </div>
   );
