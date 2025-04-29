@@ -49,7 +49,7 @@ const LeafletMap = ({
   }
 
   return (
-    <div className="h-[400px] w-full rounded-lg overflow-hidden">
+    <div className="h-[500px] w-full rounded-lg overflow-hidden">
       <MapContainer
         center={center}
         zoom={zoom}
