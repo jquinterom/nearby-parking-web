@@ -132,6 +132,10 @@ const MapPage = () => {
           onDoubleClick={(location) => handleCreateNewLocation(location)}
         />
 
+        <span className="text-gray-500 text-sm">
+          Double click on the map to add a new parking
+        </span>
+
         {location && (
           <NewPointForm
             location={location}
